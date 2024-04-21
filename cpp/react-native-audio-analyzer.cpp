@@ -87,6 +87,8 @@ std::vector<AmplitudeData> analyzeAudio(const char *filename, FFmpegException *e
     int sampleRate = codecContext->sample_rate;
     double accumulatedAmplitude = 0.0;
     long sampleCount = 0;
+    double lastStoredTimestamp = 0.0;
+    const double resolution = 0.5; // Store amplitude data every 0.5 seconds
     
     // Read frames from the input file
     while (av_read_frame(formatContext, &packet) >= 0) {
@@ -98,10 +100,13 @@ std::vector<AmplitudeData> analyzeAudio(const char *filename, FFmpegException *e
             
             // Receive frames from the codec
             while (avcodec_receive_frame(codecContext, frame) >= 0) {
-                double timestampInSeconds = frame->pts * av_q2d(formatContext->streams[audioStreamIndex]->time_base);
+                double frameDuration = 1.0 / sampleRate; // Duration of each frame in seconds
+                double frameTimestampInSeconds = frame->pts * av_q2d(formatContext->streams[audioStreamIndex]->time_base);
                 
                 // Calculate amplitude for each sample in the frame
                 for (int i = 0; i < frame->nb_samples; i++) {
+                    double timestampInSeconds = frameTimestampInSeconds + i * frameDuration;
+                    
                     for (int ch = 0; ch < codecContext->ch_layout.nb_channels; ch++) {
                         if (frame->data[ch]) {
                             // Check if the index is within bounds
@@ -109,9 +114,9 @@ std::vector<AmplitudeData> analyzeAudio(const char *filename, FFmpegException *e
                                 accumulatedAmplitude += frame->data[ch][i];
                                 sampleCount++;
                                 
-                                // Calculate amplitude per half second and store the data
-                                if (sampleCount >= sampleRate / 2) {
-                                    double amplitudePerSecond = accumulatedAmplitude / (sampleRate / 2);
+                                // Store amplitude data every resolution seconds
+                                if (timestampInSeconds >= lastStoredTimestamp + resolution) {
+                                    double amplitudePerSecond = accumulatedAmplitude / (sampleCount / frameDuration);
                                     
                                     AmplitudeData data{};
                                     data.timeInSeconds = timestampInSeconds;
@@ -121,6 +126,7 @@ std::vector<AmplitudeData> analyzeAudio(const char *filename, FFmpegException *e
                                     
                                     accumulatedAmplitude = 0.0;
                                     sampleCount = 0;
+                                    lastStoredTimestamp = timestampInSeconds;
                                 }
                             }
                         }
