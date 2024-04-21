@@ -26,30 +26,12 @@
     "!**/__mocks__",
     "!**/.*"
   ],
-  "scripts": {
-    "example": "yarn workspace react-native-audio-analyzer-example",
-    "test": "jest",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint \"**/*.{js,ts,tsx}\"",
-    "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
-    "prepare": "bob build",
-    "release": "release-it"
-  },
   "keywords": [
     "react-native",
     "ios",
     "android"
   ],
-  "repository": "https://github.com/exzos28/react-native-audio-analyzer",
-  "author": "exzos <oleksandr.kurinnyi.dev@gmail.com> (https://github.com/exzos28)",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/exzos28/react-native-audio-analyzer/issues"
-  },
-  "homepage": "https://github.com/exzos28/react-native-audio-analyzer#readme",
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
-  },
   "devDependencies": {
     "@commitlint/config-conventional": "^17.0.2",
     "@evilmartians/lefthook": "^1.5.0",
@@ -80,9 +62,6 @@
     "react": "*",
     "react-native": "*"
   },
-  "workspaces": [
-    "example"
-  ],
   "packageManager": "yarn@3.6.1",
   "engines": {
     "node": ">= 18.0.0"
