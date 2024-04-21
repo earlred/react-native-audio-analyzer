@@ -109,9 +109,9 @@ std::vector<AmplitudeData> analyzeAudio(const char *filename, FFmpegException *e
                                 accumulatedAmplitude += frame->data[ch][i];
                                 sampleCount++;
                                 
-                                // Calculate amplitude per second and store the data
-                                if (sampleCount >= sampleRate) {
-                                    double amplitudePerSecond = accumulatedAmplitude / sampleRate;
+                                // Calculate amplitude per half second and store the data
+                                if (sampleCount >= sampleRate / 2) {
+                                    double amplitudePerSecond = accumulatedAmplitude / (sampleRate / 2);
                                     
                                     AmplitudeData data{};
                                     data.timeInSeconds = timestampInSeconds;
